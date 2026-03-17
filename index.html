@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vahan Seva - UI Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Fonts: Inter for premium look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ========== TOP NAV (prototype) ========== -->
+    <header class="topbar">
+        <div class="brand">Vahan Seva</div>
+
+        <!-- simple prototype nav -->
+        <nav class="navlinks">
+            <a href="#screen-1">Home</a>
+            <a href="#screen-2">Search</a>
+            <a href="#screen-3">Verified</a>
+            <a href="#screen-4">Register User</a>
+            <a href="#screen-5">Register Mechanic</a>
+            <a href="#screen-6">Docs</a>
+        </nav>
+    </header>
+
+    <main class="app">
+
+        <!-- =========================================================
+      SCREEN 1: Landing
+    ========================================================== -->
+        <section id="screen-1" class="screen screen-hero">
+            <div class="hero-head">
+                <div class="hero-title">
+                    <h1>Vahan Seva</h1>
+                    <p class="hi">वाहन सेवा</p>
+                </div>
+
+                <p class="hero-tagline">Find Trust. Compare Price. Get Serviced.</p>
+            </div>
+
+            <div class="hero-cards">
+                <div class="info-card">
+                    <div class="icon-badge">🛡️</div>
+                    <div>
+                        <h3>Verified Mechanics</h3>
+                        <p>Background checked & community rated</p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="icon-badge">₹</div>
+                    <div>
+                        <h3>Transparent Pricing</h3>
+                        <p>Know costs before you go</p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="icon-badge">🔧</div>
+                    <div>
+                        <h3>Skilled Service</h3>
+                        <p>End overcharging, get quality repairs</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-wrap">
+                <a class="btn btn-white" href="#screen-2">Find Nearby Verified Mechanics</a>
+            </div>
+        </section>
+
+
+        <!-- =========================================================
+      SCREEN 2: Search / Home Listing
+    ========================================================== -->
+        <section id="screen-2" class="screen screen-search">
+            <div class="header-strip blue">
+                <div class="header-left">
+                    <div class="header-title">Vahan Seva</div>
+                </div>
+            </div>
+
+            <div class="search-wrap">
+                <div class="searchbar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search by Location or Vehicle Issue..." />
+                </div>
+
+                <div class="chips">
+                    <button class="chip chip-ghost">
+                        <span class="chip-icon">⛽</span>
+                        2-Wheeler Type
+                    </button>
+                    <button class="chip">Nearest</button>
+                    <button class="chip">Highest Rated</button>
+                </div>
+            </div>
+
+            <div class="content-card lightgreen">
+                <div class="section-title">
+                    <span class="green-dot">🏅</span>
+                    <div>
+                        <h2>Verified Mechanics Near You</h2>
+                        <p class="hi">सत्यापित मैकेनिक</p>
+                    </div>
+                </div>
+
+                <p class="muted">
+                    All mechanics are background-checked and rated by our community. No more trust issues.
+                </p>
+
+                <button class="btn btn-outline green full" onclick="window.location.hash='screen-3'">
+                    🛡️ View All Verified Mechanics
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-num">90%</div>
+                    <div class="stat-text">Users want trusted mechanics</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">10,000+</div>
+                    <div class="stat-text">Service reviews</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">#1</div>
+                    <div class="stat-text">Price transparency</div>
+                </div>
+            </div>
+
+            <div class="cta-wrap">
+                <button class="btn btn-orange full">
+                    📈 Compare Service Charges
+                </button>
+            </div>
+        </section>
+
+
+        <!-- =========================================================
+      SCREEN 3: Aadhaar Verified Mechanics Listing
+    ========================================================== -->
+        <section id="screen-3" class="screen screen-verified">
+            <div class="header-strip green">
+                <a class="back" href="#screen-2">←</a>
+                <div>
+                    <div class="header-title">Aadhar Verified Mechanics</div>
+                    <div class="header-sub hi">आधार सत्यापित मैकेनिक</div>
+                </div>
+            </div>
+
+            <div class="verified-top">
+                <div class="verified-badge">
+                    <div class="circle-icon">🛡️</div>
+                    <div>
+                        <h2>100% Background Verified</h2>
+                        <p class="muted">
+                            Every mechanic listed here has completed Aadhaar verification and shop inspection for your
+                            safety.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="verify-icons">
+                    <div class="verify-tile">
+                        <div class="tile-ico">✅</div>
+                        <div class="tile-text">Aadhar Verified</div>
+                    </div>
+                    <div class="verify-tile">
+                        <div class="tile-ico">🏪</div>
+                        <div class="tile-text">Shop Inspected</div>
+                    </div>
+                    <div class="verify-tile">
+                        <div class="tile-ico">⭐</div>
+                        <div class="tile-text">Community Rated</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card softblue">
+                <div class="join">
+                    <div class="join-left">
+                        <div class="join-title">Join Our Community</div>
+                        <div class="join-sub muted">
+                            Register as a user to book services, or as a mechanic to get verified and grow your
+                            business.
+                        </div>
+                    </div>
+                    <a class="btn btn-blue" href="#screen-4">Register Now</a>
+                </div>
+            </div>
+
+            <div class="list-head">
+                <h3>Verified Mechanics</h3>
+                <span class="pill" id="verified-count">✅ Loading...</span>
+            </div>
+
+            <!-- Container for dynamic mechanic list -->
+            <div class="mechanic-list" id="mechanic-list-container">
+                <div style="text-align:center; padding: 20px; color: var(--muted);">
+                    <i class="fa fa-spinner fa-spin"></i> Locating you...
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =========================================================
+      SCREEN 4: Register (User)
+    ========================================================== -->
+        <section id="screen-4" class="screen screen-register">
+            <div class="header-strip blue">
+                <a class="back" href="#screen-3">←</a>
+                <div>
+                    <div class="header-title">Register</div>
+                    <div class="header-sub hi">पंजीकरण करें</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active">👤 Register as User</button>
+                <a class="tab" href="#screen-5">🔧 Register as Mechanic</a>
+            </div>
+
+            <div class="form-card">
+                <h2>User Registration</h2>
+                <p class="muted">Quick registration to start booking verified mechanics in your area.</p>
+
+                <div class="field">
+                    <label>Full Name *</label>
+                    <input type="text" placeholder="Enter your full name" />
+                </div>
+
+                <div class="field">
+                    <label>Phone Number *</label>
+                    <input type="text" placeholder="Enter 10-digit mobile number" />
+                </div>
+
+                <div class="field">
+                    <label>Location/Village *</label>
+                    <input type="text" placeholder="Enter your location" />
+                </div>
+
+                <div class="field">
+                    <label>Vehicle Type *</label>
+                    <input type="text" placeholder="e.g., Motorcycle, Scooter" />
+                </div>
+
+                <button class="btn btn-blue full">Register as User</button>
+            </div>
+        </section>
+
+
+        <!-- =========================================================
+      SCREEN 5: Register (Mechanic)
+    ========================================================== -->
+        <section id="screen-5" class="screen screen-register">
+            <div class="header-strip blue">
+                <a class="back" href="#screen-4">←</a>
+                <div>
+                    <div class="header-title">Register</div>
+                    <div class="header-sub hi">पंजीकरण करें</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <a class="tab" href="#screen-4">👤 Register as User</a>
+                <button class="tab active">🔧 Register as Mechanic</button>
+            </div>
+
+            <div class="form-card">
+                <h2>Mechanic Registration</h2>
+
+                <div class="notice greenish">
+                    🛡️ Get verified with Aadhaar and shop photos to build trust and attract more customers.
+                </div>
+
+                <div class="field">
+                    <label>Full Name *</label>
+                    <input type="text" placeholder="Enter your full name" />
+                </div>
+
+                <div class="field">
+                    <label>Phone Number *</label>
+                    <input type="text" placeholder="Enter 10-digit mobile number" />
+                </div>
+
+                <div class="field">
+                    <label>Shop Name *</label>
+                    <input type="text" placeholder="Enter your shop name" />
+                </div>
+
+                <div class="field">
+                    <label>Shop Address *</label>
+                    <input type="text" placeholder="Enter complete shop address" />
+                </div>
+
+                <a class="btn btn-blue full" href="#screen-6">Next → Upload Documents</a>
+            </div>
+        </section>
+
+
+        <!-- =========================================================
+      SCREEN 6: Mechanic Verification Documents
+    ========================================================== -->
+        <section id="screen-6" class="screen screen-register">
+            <div class="header-strip blue">
+                <a class="back" href="#screen-5">←</a>
+                <div>
+                    <div class="header-title">Register</div>
+                    <div class="header-sub hi">पंजीकरण करें</div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="field">
+                    <label>Specialty/Services *</label>
+                    <input type="text" placeholder="e.g., Engine Repair, Brake Service" />
+                </div>
+
+                <div class="field">
+                    <label>Years of Experience *</label>
+                    <input type="text" placeholder="Enter years of experience" />
+                </div>
+
+                <!-- New Pricing Section -->
+                <h3 class="section-h">Service Pricing (₹)</h3>
+
+                <div class="field">
+                    <label>General Servicing Charge *</label>
+                    <input type="number" placeholder="e.g. 500" id="price-service" />
+                </div>
+
+                <div class="field">
+                    <label>Washing Charge *</label>
+                    <input type="number" placeholder="e.g. 150" id="price-wash" />
+                </div>
+
+                <div class="field">
+                    <label>Inspection / Visit Charge *</label>
+                    <input type="number" placeholder="e.g. 100" id="price-visit" />
+                </div>
+
+                <h3 class="section-h">Verification Documents</h3>
+
+                <div class="upload">
+                    <div class="upload-title">Aadhar Card * (Front & Back)</div>
+                    <div class="upload-sub muted">Upload clear photo of your Aadhar card</div>
+                    <input type="file" />
+                </div>
+
+                <div class="upload">
+                    <div class="upload-title">Shop Photo *</div>
+                    <div class="upload-sub muted">Upload clear photo showing your shop front with name board</div>
+                    <input type="file" />
+                </div>
+
+                <div class="notice blueish">
+                    ✅ <b>Verification Process:</b> Your documents will be verified within 24–48 hours.
+                    You'll receive a confirmation SMS once approved.
+                </div>
+
+                <button class="btn btn-green full" onclick="handleMechanicRegistration()">Submit for
+                    Verification</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer" style="text-align:center; padding: 20px; color: var(--muted); font-size: 13px;">
+        Prototype UI for AntiGravity • Vahan Seva
+    </footer>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
