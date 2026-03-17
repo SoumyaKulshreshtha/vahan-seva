@@ -97,7 +97,7 @@ function getMechanicsForQuery(query) {
 async function initData() {
     // 1. Try to fetch from API (Real Backend)
     try {
-        const res = await fetch('http://localhost:3000/api/mechanics');
+        const res = await fetch('https://vahan-seva.onrender.com/api/mechanics');
         if (res.ok) {
             const data = await res.json();
             if (data.success && data.data.length > 0) {
@@ -183,7 +183,7 @@ async function handleMechanicRegistration() {
 
     // 2. Try Backend Save
     try {
-        const res = await fetch('http://localhost:3000/api/mechanic/create', {
+        const res = await fetch('https://vahan-seva.onrender.com/api/mechanic/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
