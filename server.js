@@ -16,6 +16,11 @@ const db = new sqlite3.Database("./vahanseva.db");
 
 // ---------------------- DB INIT ----------------------
 db.serialize(() => {
+
+    db.run(`DROP TABLE IF EXISTS mechanic_documents`);
+db.run(`DROP TABLE IF EXISTS mechanics`);
+db.run(`DROP TABLE IF EXISTS bookings`);
+db.run(`DROP TABLE IF EXISTS users`);
     
     db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -96,15 +101,14 @@ function seedData() {
                 if (err) return;
 
                 const [u1, u2, u3] = rows.map((r) => r.id);
-
-                db.run(
-                    `INSERT INTO mechanics (user_id, shop_name, shop_address, services, experience_years, rating, distance_km) VALUES
-          (?, 'Ramesh Auto Works', 'Near Bus Stand', 'General Service,Brake Repair,Puncture', 8, 4.8, 2.1),
-          (?, 'Sharma Bike Service', 'Main Market Road', 'Oil Change,Chain Repair,Brake Repair', 10, 4.6, 3.6),
-          (?, 'Aman Garage', 'Village Chowk', 'Engine Repair,Clutch Repair,General Service', 6, 4.3, 5.0)
-        `,
-                    [u1, u2, u3]
-                );
+db.run(
+    `INSERT INTO mechanics (user_id, shop_name, shop_address, services, experience_years, rating, distance_km, price_service, price_wash) VALUES
+    (?, 'Ramesh Auto Works', 'Near Bus Stand', 'General Service,Brake Repair,Puncture', 8, 4.8, 2.1, '500', '150'),
+    (?, 'Sharma Bike Service', 'Main Market Road', 'Oil Change,Chain Repair,Brake Repair', 10, 4.6, 3.6, '400', '120'),
+    (?, 'Aman Garage', 'Village Chowk', 'Engine Repair,Clutch Repair,General Service', 6, 4.3, 5.0, '450', '100')
+    `,
+    [u1, u2, u3]
+);
             });
         }
     );
