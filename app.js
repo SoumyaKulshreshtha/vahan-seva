@@ -204,12 +204,37 @@ async function handleMechanicRegistration() {
         });
         const mechData = await mechRes.json();
         if (mechData.success) {
+            // Step 3: Upload documents
+            const mechanicId = mechData.data.id;
+
+            async function uploadFile(inputId, docType) {
+                const input = document.getElementById(inputId);
+                if (!input || !input.files[0]) return;
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    await fetch('YOUR_RENDER_URL/api/mechanic/upload-doc', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            mechanic_id: mechanicId,
+                            doc_type: docType,
+                            image_data: reader.result
+                        })
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+
+            await uploadFile('aadhar-file', 'aadhar');
+            await uploadFile('shop-photo-file', 'shop_photo');
+
             alert("Registration submitted! Waiting for admin approval.");
             window.location.hash = '#screen-3';
-        } else {
+        }  else {
             alert("Error: " + mechData.message);
         }
-    } catch (e) {
+     catch (e) {
         alert("Cannot reach server. Please check your connection.");
     }
 }
