@@ -169,7 +169,7 @@ async function loadDocs(mechanicId) {
     docsEl.innerHTML = data.data.map(doc => `
         <div style="margin-bottom:8px;">
             <div style="font-size:11px; font-weight:700; color:#555; margin-bottom:4px;">
-                ${doc.doc_type === 'aadhar' ? ' Aadhaar Card' :  Shop Photo'}
+                ${doc.doc_type === 'aadhar' ? ' Aadhaar Card' :  'Shop Photo'}
             </div>
             <img src="${doc.image_data}" style="width:100%; max-width:300px; border-radius:10px; border:1px solid #eee;" />
         </div>
