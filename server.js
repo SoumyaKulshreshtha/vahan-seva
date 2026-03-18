@@ -143,13 +143,13 @@ app.post("/api/auth/register", (req, res) => {
  * Body: { user_id, shop_name, shop_address, services, experience_years }
  */
 app.post("/api/mechanic/create", (req, res) => {
-    const { user_id, shop_name, shop_address, services, experience_years } = req.body;
+    const { user_id, shop_name, shop_address, services, experience_years, price_service, price_wash } = req.body;
     if (!user_id || !shop_name || !shop_address) return fail(res, "user_id, shop_name, shop_address required");
 
     db.run(
-        `INSERT INTO mechanics (user_id, shop_name, shop_address, services, experience_years, verified)
-     VALUES (?, ?, ?, ?, ?, 0, ?, ?)`,
-        [user_id, shop_name, shop_address, services || "", parseInt(experience_years || "0")],
+        `INSERT INTO mechanics (user_id, shop_name, shop_address, services, experience_years, verified, price_service, price_wash)
+         VALUES (?, ?, ?, ?, ?, 0, ?, ?)`,
+        [user_id, shop_name, shop_address, services || "", parseInt(experience_years || "0"), price_service || "0", price_wash || "0"],
         function (err) {
             if (err) return fail(res, err.message);
             db.get(`SELECT * FROM mechanics WHERE id=?`, [this.lastID], (e2, row) => {
