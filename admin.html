@@ -76,8 +76,7 @@
 </div>
 
 <script>
-    // ← Replace this with your Render URL
-    const API = "https://your-render-url.onrender.com";
+    const API = "https://vahan-seva.onrender.com";
 
     let adminToken = "";
 
@@ -129,7 +128,7 @@
                 <div class="card-info">
                     <div class="card-name">${m.shop_name} <span class="badge-pending">Pending</span></div>
                     <div class="card-sub">
-                         ${m.full_name} &nbsp;|&nbsp; 📞 ${m.phone}<br>
+                         ${m.full_name} &nbsp;|&nbsp;  ${m.phone}<br>
                          ${m.shop_address}<br>
                          ${m.services || "Not specified"} &nbsp;|&nbsp; ${m.experience_years} yrs exp
                     </div>
