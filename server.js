@@ -16,7 +16,7 @@ const db = new sqlite3.Database("./vahanseva.db");
 
 // ---------------------- DB INIT ----------------------
 db.serialize(() => {
-    
+    db.run(`DROP TABLE IF EXISTS appointments`);
     db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
