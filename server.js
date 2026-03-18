@@ -332,6 +332,37 @@ app.post("/api/admin/approve", (req, res) => {
         return ok(res, { mechanic_id, status: "approved" });
     });
 });
+
+// Upload document image (base64)
+app.post("/api/mechanic/upload-doc", (req, res) => {
+    const { mechanic_id, doc_type, image_data } = req.body;
+    if (!mechanic_id || !doc_type || !image_data) return fail(res, "mechanic_id, doc_type, image_data required");
+
+    db.run(
+        `INSERT INTO mechanic_documents (mechanic_id, doc_type, image_data) VALUES (?, ?, ?)`,
+        [mechanic_id, doc_type, image_data],
+        function (err) {
+            if (err) return fail(res, err.message);
+            return ok(res, { id: this.lastID });
+        }
+    );
+});
+
+// Get documents for a mechanic
+app.get("/api/mechanic/:mechanic_id/docs", (req, res) => {
+    const token = req.headers["x-admin-token"];
+    if (token !== "admin-secret-token") return fail(res, "Unauthorized", 401);
+
+    db.all(
+        `SELECT doc_type, image_data FROM mechanic_documents WHERE mechanic_id = ?`,
+        [req.params.mechanic_id],
+        (err, rows) => {
+            if (err) return fail(res, err.message);
+            return ok(res, rows);
+        }
+    );
+});
+
 // ---------------------- SERVER ----------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Backend running on http://localhost:${PORT}`));
