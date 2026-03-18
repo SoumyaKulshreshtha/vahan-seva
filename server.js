@@ -65,6 +65,20 @@ db.serialize(() => {
   `);
 
     db.run(`
+    CREATE TABLE IF NOT EXISTS appointments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      full_name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      address TEXT NOT NULL,
+      vehicle_type TEXT,
+      issue TEXT NOT NULL,
+      preferred_datetime TEXT,
+      status TEXT DEFAULT 'Pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+`);
+
+    db.run(`
     CREATE TABLE IF NOT EXISTS mechanic_documents (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       mechanic_id INTEGER NOT NULL,
@@ -375,6 +389,37 @@ app.post("/api/admin/reject", (req, res) => {
     db.run(`UPDATE mechanics SET verified = -1, reject_reason = ? WHERE id = ?`, [reason, mechanic_id], function(err) {
         if (err) return fail(res, err.message);
         return ok(res, { mechanic_id, status: "rejected" });
+    });
+});
+
+// Book home appointment
+app.post("/api/appointments/create", (req, res) => {
+    const { full_name, phone, address, vehicle_type, issue, preferred_datetime } = req.body;
+    if (!full_name || !phone || !address || !issue) 
+        return fail(res, "full_name, phone, address and issue are required");
+
+    db.run(
+        `INSERT INTO appointments (full_name, phone, address, vehicle_type, issue, preferred_datetime)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [full_name, phone, address, vehicle_type || "", issue, preferred_datetime || ""],
+        function (err) {
+            if (err) return fail(res, err.message);
+            db.get(`SELECT * FROM appointments WHERE id=?`, [this.lastID], (e2, row) => {
+                if (e2) return fail(res, "Created but fetch failed");
+                return ok(res, row);
+            });
+        }
+    );
+});
+
+// Get all appointments (admin)
+app.get("/api/appointments", (req, res) => {
+    const token = req.headers["x-admin-token"];
+    if (token !== "admin-secret-token") return fail(res, "Unauthorized", 401);
+
+    db.all(`SELECT * FROM appointments ORDER BY created_at DESC`, (err, rows) => {
+        if (err) return fail(res, err.message);
+        return ok(res, rows);
     });
 });
 
