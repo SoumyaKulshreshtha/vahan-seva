@@ -213,7 +213,7 @@ async function handleMechanicRegistration() {
                 const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = async () => {
-                    await fetch('YOUR_RENDER_URL/api/mechanic/upload-doc', {
+                    await fetch('https://vahan-seva.onrender.com/api/mechanic/upload-doc', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
