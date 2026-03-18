@@ -153,7 +153,6 @@ async function initData() {
 
 // --- Registration Logic ---
 async function handleMechanicRegistration() {
-    // Collect all fields from Screen 5 and Screen 6
     const fullName = document.querySelector('#screen-5 input[placeholder="Enter your full name"]')?.value.trim() || "";
     const phone = document.querySelector('#screen-5 input[placeholder="Enter 10-digit mobile number"]')?.value.trim() || "";
     const shopName = document.querySelector('#screen-5 input[placeholder="Enter your shop name"]')?.value.trim() || "";
@@ -169,16 +168,10 @@ async function handleMechanicRegistration() {
     }
 
     try {
-        // Step 1: Register the user first to get a real user_id
         const userRes = await fetch('https://vahan-seva.onrender.com/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                role: 'mechanic',
-                full_name: fullName,
-                phone: phone,
-                location: address
-            })
+            body: JSON.stringify({ role: 'mechanic', full_name: fullName, phone: phone, location: address })
         });
         const userData = await userRes.json();
         if (!userData.success) {
@@ -188,7 +181,6 @@ async function handleMechanicRegistration() {
 
         const userId = userData.data.id;
 
-        // Step 2: Create mechanic profile with real user_id
         const mechRes = await fetch('https://vahan-seva.onrender.com/api/mechanic/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -203,13 +195,13 @@ async function handleMechanicRegistration() {
             })
         });
         const mechData = await mechRes.json();
+
         if (mechData.success) {
-            // Step 3: Upload documents
             const mechanicId = mechData.data.id;
 
-            async function uploadFile(inputId, docType) {
+            const uploadFile = (inputId, docType) => new Promise((resolve) => {
                 const input = document.getElementById(inputId);
-                if (!input || !input.files[0]) return;
+                if (!input || !input.files[0]) return resolve();
                 const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = async () => {
@@ -222,19 +214,20 @@ async function handleMechanicRegistration() {
                             image_data: reader.result
                         })
                     });
+                    resolve();
                 };
                 reader.readAsDataURL(file);
-            }
+            });
 
             await uploadFile('aadhar-file', 'aadhar');
             await uploadFile('shop-photo-file', 'shop_photo');
 
             alert("Registration submitted! Waiting for admin approval.");
             window.location.hash = '#screen-3';
-        }  else {
+        } else {
             alert("Error: " + mechData.message);
         }
-     catch (e) {
+    } catch (e) {
         alert("Cannot reach server. Please check your connection.");
     }
 }
