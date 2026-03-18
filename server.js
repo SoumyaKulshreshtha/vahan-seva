@@ -43,6 +43,7 @@ db.serialize(() => {
       distance_km REAL DEFAULT 2.0,
       price_service TEXT DEFAULT '0',
       price_wash TEXT DEFAULT '0',
+      reject_reason TEXT DEFAULT NULL,
       FOREIGN KEY(user_id) REFERENCES users(id)
     )
   `);
@@ -361,6 +362,20 @@ app.get("/api/mechanic/:mechanic_id/docs", (req, res) => {
             return ok(res, rows);
         }
     );
+});
+
+// Reject a mechanic
+app.post("/api/admin/reject", (req, res) => {
+    const token = req.headers["x-admin-token"];
+    if (token !== "admin-secret-token") return fail(res, "Unauthorized", 401);
+
+    const { mechanic_id, reason } = req.body;
+    if (!mechanic_id || !reason) return fail(res, "mechanic_id and reason required");
+
+    db.run(`UPDATE mechanics SET verified = -1, reject_reason = ? WHERE id = ?`, [reason, mechanic_id], function(err) {
+        if (err) return fail(res, err.message);
+        return ok(res, { mechanic_id, status: "rejected" });
+    });
 });
 
 // ---------------------- SERVER ----------------------
