@@ -155,6 +155,7 @@
         `;
         listEl.appendChild(card);
     });
+        loadAppointments();
 }
 
 async function loadDocs(mechanicId) {
@@ -231,6 +232,41 @@ async function confirmReject(mechanicId) {
         card.querySelector('.badge-pending').style.color = "#c62828";
     }
 }
+    async function loadAppointments() {
+    const listEl = document.getElementById("appointments-list");
+    listEl.innerHTML = "<p style='color:#999;'>Loading...</p>";
+
+    const res = await fetch(`${API}/api/appointments`, {
+        headers: { "x-admin-token": adminToken }
+    });
+    const data = await res.json();
+
+    if (!data.success || data.data.length === 0) {
+        listEl.innerHTML = `<div class="empty">No appointments yet.</div>`;
+        return;
+    }
+
+    listEl.innerHTML = "";
+    data.data.forEach(a => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <div class="card-info">
+                <div class="card-name">${a.full_name} <span class="badge-pending">${a.status}</span></div>
+                <div class="card-sub">
+                    📞 ${a.phone}<br>
+                    📍 ${a.address}<br>
+                    🚗 ${a.vehicle_type || "Not specified"}<br>
+                    🔧 <b>Issue:</b> ${a.issue}<br>
+                    🕐 ${a.preferred_datetime || "Any time"}<br>
+                    📅 Booked: ${new Date(a.created_at).toLocaleString()}
+                </div>
+            </div>
+        `;
+        listEl.appendChild(card);
+    });
+}
+    
     function handleLogout() {
         adminToken = "";
         document.getElementById("login-section").style.display = "block";
