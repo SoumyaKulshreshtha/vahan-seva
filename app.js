@@ -275,8 +275,8 @@ function renderMechanics(mechanics, searchQuery = "") {
     }
 
     // Separate Verified vs External
-    const verifiedList = list.filter(m => m.verified !== false);
-    const externalList = list.filter(m => m.verified === false);
+    const verifiedList = list.filter(m => m.verified === 1 || m.verified === true);
+    const externalList = list.filter(m => m.verified === 0 || m.verified === false || m.verified === -1);
 
     // 1. Render Verified Mechanics
     if (verifiedList.length > 0) {
