@@ -27,6 +27,44 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c; // Distance in km
 }
 
+async function handleAppointmentBooking() {
+    const fullName = document.getElementById('appt-name')?.value.trim() || "";
+    const phone = document.getElementById('appt-phone')?.value.trim() || "";
+    const address = document.getElementById('appt-address')?.value.trim() || "";
+    const vehicle = document.getElementById('appt-vehicle')?.value.trim() || "";
+    const issue = document.getElementById('appt-issue')?.value.trim() || "";
+    const datetime = document.getElementById('appt-datetime')?.value.trim() || "";
+
+    if (!fullName || !phone || !address || !issue) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    try {
+        const res = await fetch('https://vahan-seva.onrender.com/api/appointments/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                full_name: fullName,
+                phone: phone,
+                address: address,
+                vehicle_type: vehicle,
+                issue: issue,
+                preferred_datetime: datetime
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("✅ Appointment booked! We will contact you shortly.");
+            window.location.hash = '#screen-2';
+        } else {
+            alert("Error: " + data.message);
+        }
+    } catch (e) {
+        alert("Cannot reach server. Please check your connection.");
+    }
+}
+
 // --- Navigation (SPA Logic) ---
 function handleNavigation() {
     const hash = window.location.hash || '#screen-1'; // Default to Home
