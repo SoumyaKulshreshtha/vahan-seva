@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Vahan Seva — Admin</title>
+    <title>Vahan Seva - Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -270,6 +270,32 @@ async function confirmReject(mechanicId) {
     `;
     listEl.appendChild(card);
 });
+}
+    async function sendAlertToMechanics(appointmentId, address, issue) {
+    const btn = document.getElementById(`alert-btn-${appointmentId}`);
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+
+    const res = await fetch(`${API}/api/appointments/alert`, {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json",
+            "x-admin-token": adminToken 
+        },
+        body: JSON.stringify({ appointment_id: appointmentId })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+        btn.textContent = "✅ Alert Sent!";
+        btn.style.background = "#0aa04f";
+        document.getElementById(`appt-status-${appointmentId}`).textContent = "Alerted";
+        document.getElementById(`appt-status-${appointmentId}`).style.background = "#eafff2";
+        document.getElementById(`appt-status-${appointmentId}`).style.color = "#0b7f40";
+    } else {
+        btn.textContent = "❌ Failed";
+        btn.disabled = false;
+    }
 }
     
     function handleLogout() {
