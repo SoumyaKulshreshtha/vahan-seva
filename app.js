@@ -153,69 +153,65 @@ async function initData() {
 
 // --- Registration Logic ---
 async function handleMechanicRegistration() {
-    // 1. Collect Data
-    const name = document.querySelector('input[placeholder="Enter your full name"]')?.value || "Unknown";
-    const shopName = document.querySelector('input[placeholder="Enter your shop name"]')?.value || "New Shop";
-    const address = document.querySelector('input[placeholder="Enter complete shop address"]')?.value || "Local Address";
-
-    // Pricing Inputs
+    // Collect all fields from Screen 5 and Screen 6
+    const fullName = document.querySelector('#screen-5 input[placeholder="Enter your full name"]')?.value.trim() || "";
+    const phone = document.querySelector('#screen-5 input[placeholder="Enter 10-digit mobile number"]')?.value.trim() || "";
+    const shopName = document.querySelector('#screen-5 input[placeholder="Enter your shop name"]')?.value.trim() || "";
+    const address = document.querySelector('#screen-5 input[placeholder="Enter complete shop address"]')?.value.trim() || "";
+    const services = document.querySelector('#screen-6 input[placeholder="e.g., Engine Repair, Brake Service"]')?.value.trim() || "";
+    const experience = document.querySelector('#screen-6 input[placeholder="Enter years of experience"]')?.value.trim() || "0";
     const priceService = document.getElementById('price-service')?.value || "0";
     const priceWash = document.getElementById('price-wash')?.value || "0";
 
-    if (!name || !shopName) {
-        alert("Please fill in the details.");
+    if (!fullName || !phone || !shopName || !address) {
+        alert("Please fill in all required fields (Name, Phone, Shop Name, Address).");
         return;
     }
 
-    const newMechanic = {
-        id: Date.now(),
-        name: shopName, // Display Shop Name as main name
-        shop_name: shopName,
-        address: address,
-        rating: 5.0, // New joiner
-        verified: false, // Pending verification
-        distance: 0, // Will be calculated
-        lat: 0,
-        lon: 0,
-        price_service: priceService,
-        price_wash: priceWash
-    };
-
-    // 2. Try Backend Save
     try {
-        const res = await fetch('https://vahan-seva.onrender.com/api/mechanic/create', {
+        // Step 1: Register the user first to get a real user_id
+        const userRes = await fetch('https://vahan-seva.onrender.com/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                user_id: 1,
-                shop_name: shopName,
-                shop_address: address,
-                services: "General",
-                experience_years: 0
+                role: 'mechanic',
+                full_name: fullName,
+                phone: phone,
+                location: address
             })
         });
-        if (res.ok) {
-            alert("Registered successfully on Server!");
+        const userData = await userRes.json();
+        if (!userData.success) {
+            alert("Registration failed: " + userData.message);
+            return;
+        }
+
+        const userId = userData.data.id;
+
+        // Step 2: Create mechanic profile with real user_id
+        const mechRes = await fetch('https://vahan-seva.onrender.com/api/mechanic/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: userId,
+                shop_name: shopName,
+                shop_address: address,
+                services: services,
+                experience_years: parseInt(experience),
+                price_service: priceService,
+                price_wash: priceWash
+            })
+        });
+        const mechData = await mechRes.json();
+        if (mechData.success) {
+            alert("Registration submitted! Waiting for admin approval.");
+            window.location.hash = '#screen-3';
+        } else {
+            alert("Error: " + mechData.message);
         }
     } catch (e) {
-        console.log("Backend offline, saving locally.");
-        alert("Registration Received! (Saved Locally for Demo)");
+        alert("Cannot reach server. Please check your connection.");
     }
-
-    // 3. Save Locally 
-    state.mechanics.push(newMechanic);
-
-    // Recalculate distance if location available
-    if (state.userLocation) {
-        newMechanic.lat = state.userLocation.lat + 0.001;
-        newMechanic.lon = state.userLocation.lon + 0.001;
-        newMechanic.distance = calculateDistance(state.userLocation.lat, state.userLocation.lon, newMechanic.lat, newMechanic.lon);
-    }
-
-    // Go to home to see the list
-    window.location.hash = '#screen-3'; // Assuming list is Screen 3 now based on verified flow
-    const results = getMechanicsForQuery(state.searchQuery);
-    renderMechanics(results, state.searchQuery);
 }
 
 
