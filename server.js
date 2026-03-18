@@ -146,7 +146,7 @@ app.post("/api/mechanic/create", (req, res) => {
 
     db.run(
         `INSERT INTO mechanics (user_id, shop_name, shop_address, services, experience_years, verified)
-     VALUES (?, ?, ?, ?, ?, 1)`,
+     VALUES (?, ?, ?, ?, ?, 0)`,
         [user_id, shop_name, shop_address, services || "", parseInt(experience_years || "0")],
         function (err) {
             if (err) return fail(res, err.message);
