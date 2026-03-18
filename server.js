@@ -25,8 +25,6 @@ db.serialize(() => {
       location TEXT,
       vehicle_type TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      price_service TEXT DEFAULT '0',
-      price_wash TEXT DEFAULT '0',
     )
   `);
 
@@ -43,6 +41,8 @@ db.serialize(() => {
       verified INTEGER DEFAULT 1,
       rating REAL DEFAULT 4.5,
       distance_km REAL DEFAULT 2.0,
+      price_service TEXT DEFAULT '0',
+      price_wash TEXT DEFAULT '0',
       FOREIGN KEY(user_id) REFERENCES users(id)
     )
   `);
