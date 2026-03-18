@@ -320,7 +320,7 @@ function renderCard(m, container) {
       <div class="m-info">
         <div class="m-name">
           ${m.name}
-          ${m.verified !== false ? '<span class="tick">✔</span>' : ''}
+          ${m.verified === 1 ? '<span class="tick">✔</span>' : ''}
         </div>
         <div class="m-sub muted">
             ${m.distance ? m.distance.toFixed(1) : '2.0'} km • ${m.address} • ${m.rating || 4.5} ⭐
@@ -328,7 +328,7 @@ function renderCard(m, container) {
         </div>
         ${m.verified === false ? `<a href="https://www.google.com/maps/search/${encodeURIComponent(m.shop_name + ' ' + m.address)}" target="_blank" style="font-size:11px; color:#0b4dff; text-decoration:underline;">View on Google</a>` : ''}
       </div>
-      ${m.verified !== false
+      ${m.verified === 1
             ? '<span class="tag green">Verified</span>'
             : '<span class="tag" style="background:#f0f0f0; color:#666; font-size:10px;">External</span>'}
     `;
