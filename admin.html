@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vahan Seva — Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f4f6fb; color: #0e1a2b; }
+        .topbar { background: #0b4dff; color: #fff; padding: 14px 24px; font-size: 20px; font-weight: 900; }
+        .container { max-width: 700px; margin: 30px auto; padding: 0 16px; }
+
+        /* Login */
+        #login-section { background: #fff; border-radius: 18px; padding: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        #login-section h2 { margin-bottom: 20px; font-size: 22px; }
+        .field { margin-bottom: 16px; }
+        label { display: block; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+        input[type="text"], input[type="password"] {
+            width: 100%; padding: 12px; border-radius: 12px;
+            border: 1px solid #e0e5f0; font-size: 14px; background: #f7f8fb; outline: none;
+        }
+        .btn { border: none; border-radius: 12px; padding: 13px 20px; font-weight: 800;
+               font-size: 15px; cursor: pointer; width: 100%; margin-top: 8px; }
+        .btn-blue { background: #0b4dff; color: #fff; }
+        .btn-green { background: #0aa04f; color: #fff; width: auto; padding: 8px 18px; font-size: 13px; }
+        .btn-red { background: #e53935; color: #fff; width: auto; padding: 8px 18px; font-size: 13px; }
+        .error { color: #e53935; font-size: 13px; margin-top: 10px; }
+
+        /* Dashboard */
+        #dashboard-section { display: none; }
+        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .dash-header h2 { font-size: 20px; }
+        .logout { font-size: 13px; color: #0b4dff; cursor: pointer; font-weight: 700; }
+        .card { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 14px;
+                border: 1px solid #eef1f7; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .card-info { flex: 1; }
+        .card-name { font-weight: 900; font-size: 16px; margin-bottom: 4px; }
+        .card-sub { font-size: 13px; color: #6b7a90; line-height: 1.5; }
+        .empty { text-align: center; padding: 40px; color: #6b7a90; background: #fff;
+                 border-radius: 16px; border: 1px solid #eef1f7; }
+        .badge-pending { background: #fff3e0; color: #e65100; border-radius: 999px;
+                         padding: 4px 10px; font-size: 12px; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">Vahan Seva — Admin Panel</div>
+
+<div class="container">
+
+    <!-- LOGIN -->
+    <div id="login-section">
+        <h2> Admin Login</h2>
+        <div class="field">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username" />
+        </div>
+        <div class="field">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter password" />
+        </div>
+        <button class="btn btn-blue" onclick="handleLogin()">Login</button>
+        <div class="error" id="login-error"></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard-section">
+        <div class="dash-header">
+            <h2> Pending Mechanic Approvals</h2>
+            <span class="logout" onclick="handleLogout()">Logout</span>
+        </div>
+        <div id="pending-list"></div>
+    </div>
+
+</div>
+
+<script>
+    // ← Replace this with your Render URL
+    const API = "https://your-render-url.onrender.com";
+
+    let adminToken = "";
+
+    async function handleLogin() {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const errorEl = document.getElementById("login-error");
+        errorEl.textContent = "";
+
+        try {
+            const res = await fetch(`${API}/api/admin/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                adminToken = data.data.token;
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("dashboard-section").style.display = "block";
+                loadPending();
+            } else {
+                errorEl.textContent = "" + data.message;
+            }
+        } catch (e) {
+            errorEl.textContent = "Cannot reach server. Check your API URL.";
+        }
+    }
+
+    async function loadPending() {
+        const listEl = document.getElementById("pending-list");
+        listEl.innerHTML = "<p style='color:#999;'>Loading...</p>";
+
+        const res = await fetch(`${API}/api/admin/pending`, {
+            headers: { "x-admin-token": adminToken }
+        });
+        const data = await res.json();
+
+        if (!data.success || data.data.length === 0) {
+            listEl.innerHTML = `<div class="empty"> No pending approvals right now.</div>`;
+            return;
+        }
+
+        listEl.innerHTML = "";
+        data.data.forEach(m => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+                <div class="card-info">
+                    <div class="card-name">${m.shop_name} <span class="badge-pending">Pending</span></div>
+                    <div class="card-sub">
+                         ${m.full_name} &nbsp;|&nbsp; 📞 ${m.phone}<br>
+                         ${m.shop_address}<br>
+                         ${m.services || "Not specified"} &nbsp;|&nbsp; ${m.experience_years} yrs exp
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn btn-green" onclick="approveMechanic(${m.id}, this)"> Approve</button>
+                </div>
+            `;
+            listEl.appendChild(card);
+        });
+    }
+
+    async function approveMechanic(mechanicId, btn) {
+        btn.disabled = true;
+        btn.textContent = "Approving...";
+
+        const res = await fetch(`${API}/api/admin/approve`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-admin-token": adminToken
+            },
+            body: JSON.stringify({ mechanic_id: mechanicId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            btn.closest(".card").style.opacity = "0.4";
+            btn.textContent = "Approved";
+        } else {
+            btn.textContent = "Failed";
+        }
+    }
+
+    function handleLogout() {
+        adminToken = "";
+        document.getElementById("login-section").style.display = "block";
+        document.getElementById("dashboard-section").style.display = "none";
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+    }
+</script>
+</body>
+</html>
