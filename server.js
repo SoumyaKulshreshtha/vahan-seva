@@ -425,6 +425,24 @@ app.get("/api/appointments", (req, res) => {
     });
 });
 
+// Send alert to nearby mechanics (marks appointment as Alerted)
+app.post("/api/appointments/alert", (req, res) => {
+    const token = req.headers["x-admin-token"];
+    if (token !== "admin-secret-token") return fail(res, "Unauthorized", 401);
+
+    const { appointment_id } = req.body;
+    if (!appointment_id) return fail(res, "appointment_id required");
+
+    db.run(
+        `UPDATE appointments SET status = 'Alerted' WHERE id = ?`,
+        [appointment_id],
+        function (err) {
+            if (err) return fail(res, err.message);
+            return ok(res, { appointment_id, status: "Alerted" });
+        }
+    );
+});
+
 // ---------------------- SERVER ----------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Backend running on http://localhost:${PORT}`));
