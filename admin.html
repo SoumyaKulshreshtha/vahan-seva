@@ -247,24 +247,29 @@ async function confirmReject(mechanicId) {
     }
 
     listEl.innerHTML = "";
-    data.data.forEach(a => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-            <div class="card-info">
-                <div class="card-name">${a.full_name} <span class="badge-pending">${a.status}</span></div>
-                <div class="card-sub">
-                    📞 ${a.phone}<br>
-                    📍 ${a.address}<br>
-                    🚗 ${a.vehicle_type || "Not specified"}<br>
-                    🔧 <b>Issue:</b> ${a.issue}<br>
-                    🕐 ${a.preferred_datetime || "Any time"}<br>
-                    📅 Booked: ${new Date(a.created_at).toLocaleString()}
-                </div>
+   data.data.forEach(a => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+        <div class="card-info">
+            <div class="card-name">${a.full_name} <span class="badge-pending" id="appt-status-${a.id}">${a.status}</span></div>
+            <div class="card-sub">
+                Contact: No. ${a.phone}<br>
+                Address:  ${a.address}<br>
+                Vehicle: ${a.vehicle_type || "Not specified"}<br>
+                Issue: ${a.issue}<br>
+                Appointment Time:  ${a.preferred_datetime || "Any time"}<br>
+                Booked On: ${new Date(a.created_at).toLocaleString()}
             </div>
-        `;
-        listEl.appendChild(card);
-    });
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; min-width:140px; align-items:flex-end;">
+            <button class="btn btn-blue" id="alert-btn-${a.id}" onclick="sendAlertToMechanics(${a.id}, '${a.address}', '${a.issue.replace(/'/g, '')}')">
+                🔔 Alert Nearby Mechanics
+            </button>
+        </div>
+    `;
+    listEl.appendChild(card);
+});
 }
     
     function handleLogout() {
