@@ -62,6 +62,17 @@ db.serialize(() => {
     )
   `);
 
+    db.run(`
+    CREATE TABLE IF NOT EXISTS mechanic_documents (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      mechanic_id INTEGER NOT NULL,
+      doc_type TEXT NOT NULL,
+      image_data TEXT NOT NULL,
+      uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(mechanic_id) REFERENCES mechanics(id)
+    )
+`);
+
     // Seed mechanics (only if no mechanics exist)
     db.get(`SELECT COUNT(*) as count FROM mechanics`, (err, row) => {
         if (err) return;
