@@ -278,7 +278,47 @@ app.post("/api/bookings/update-status", (req, res) => {
         }
     );
 });
+// ---------------------- ADMIN ROUTES ----------------------
 
+// Admin login
+app.post("/api/admin/login", (req, res) => {
+    const { username, password } = req.body;
+    if (username === "admin" && password === "vahanseva123") {
+        return ok(res, { token: "admin-secret-token" });
+    }
+    return fail(res, "Invalid credentials", 401);
+});
+
+// Get all pending mechanics (verified = 0)
+app.get("/api/admin/pending", (req, res) => {
+    const token = req.headers["x-admin-token"];
+    if (token !== "admin-secret-token") return fail(res, "Unauthorized", 401);
+
+    db.all(`
+        SELECT m.*, u.full_name, u.phone, u.location
+        FROM mechanics m
+        JOIN users u ON u.id = m.user_id
+        WHERE m.verified = 0
+        ORDER BY m.id DESC
+    `, (err, rows) => {
+        if (err) return fail(res, err.message);
+        return ok(res, rows);
+    });
+});
+
+// Approve a mechanic
+app.post("/api/admin/approve", (req, res) => {
+    const token = req.headers["x-admin-token"];
+    if (token !== "admin-secret-token") return fail(res, "Unauthorized", 401);
+
+    const { mechanic_id } = req.body;
+    if (!mechanic_id) return fail(res, "mechanic_id required");
+
+    db.run(`UPDATE mechanics SET verified = 1 WHERE id = ?`, [mechanic_id], function(err) {
+        if (err) return fail(res, err.message);
+        return ok(res, { mechanic_id, status: "approved" });
+    });
+});
 // ---------------------- SERVER ----------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Backend running on http://localhost:${PORT}`));
