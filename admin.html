@@ -107,62 +107,125 @@
     }
 
     async function loadPending() {
-        const listEl = document.getElementById("pending-list");
-        listEl.innerHTML = "<p style='color:#999;'>Loading...</p>";
+    const listEl = document.getElementById("pending-list");
+    listEl.innerHTML = "<p style='color:#999;'>Loading...</p>";
 
-        const res = await fetch(`${API}/api/admin/pending`, {
-            headers: { "x-admin-token": adminToken }
-        });
-        const data = await res.json();
+    const res = await fetch(`${API}/api/admin/pending`, {
+        headers: { "x-admin-token": adminToken }
+    });
+    const data = await res.json();
 
-        if (!data.success || data.data.length === 0) {
-            listEl.innerHTML = `<div class="empty"> No pending approvals right now.</div>`;
-            return;
-        }
-
-        listEl.innerHTML = "";
-        data.data.forEach(m => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-                <div class="card-info">
-                    <div class="card-name">${m.shop_name} <span class="badge-pending">Pending</span></div>
-                    <div class="card-sub">
-                         ${m.full_name} &nbsp;|&nbsp;  ${m.phone}<br>
-                         ${m.shop_address}<br>
-                         ${m.services || "Not specified"} &nbsp;|&nbsp; ${m.experience_years} yrs exp
-                    </div>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <button class="btn btn-green" onclick="approveMechanic(${m.id}, this)"> Approve</button>
-                </div>
-            `;
-            listEl.appendChild(card);
-        });
+    if (!data.success || data.data.length === 0) {
+        listEl.innerHTML = `<div class="empty"> No pending approvals right now.</div>`;
+        return;
     }
 
-    async function approveMechanic(mechanicId, btn) {
-        btn.disabled = true;
-        btn.textContent = "Approving...";
+    listEl.innerHTML = "";
+    data.data.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.id = `card-${m.id}`;
+        card.innerHTML = `
+            <div class="card-info">
+                <div class="card-name">${m.shop_name} <span class="badge-pending">Pending</span></div>
+                <div class="card-sub">
+                     ${m.full_name} &nbsp;|&nbsp;  ${m.phone}<br>
+                     ${m.shop_address}<br>
+                     ${m.services || "Not specified"} &nbsp;|&nbsp; ${m.experience_years} yrs exp<br>
+                     Servicing: ₹${m.price_service || "N/A"} &nbsp;|&nbsp; Washing: ₹${m.price_wash || "N/A"}
+                </div>
+                <div id="docs-${m.id}" style="margin-top:10px;"></div>
+                <div id="reject-box-${m.id}" style="display:none; margin-top:10px;">
+                    <textarea id="reject-reason-${m.id}" placeholder="Enter reason for rejection..." 
+                        style="width:100%; padding:10px; border-radius:10px; border:1px solid #e0e5f0; font-size:13px; resize:vertical; min-height:80px;"></textarea>
+                    <button class="btn btn-red" style="margin-top:8px;" onclick="confirmReject(${m.id})">Confirm Reject</button>
+                    <button onclick="cancelReject(${m.id})" style="margin-top:8px; margin-left:8px; background:none; border:none; color:#666; cursor:pointer; font-size:13px;">Cancel</button>
+                </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; min-width:110px; align-items:flex-end;">
+                <button class="btn btn-outline" onclick="loadDocs(${m.id})"> View Docs</button>
+                <button class="btn btn-green" onclick="approveMechanic(${m.id}, this)"> Approve</button>
+                <button class="btn btn-red" onclick="showRejectBox(${m.id})"> Reject</button>
+            </div>
+        `;
+        listEl.appendChild(card);
+    });
+}
 
-        const res = await fetch(`${API}/api/admin/approve`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-admin-token": adminToken
-            },
-            body: JSON.stringify({ mechanic_id: mechanicId })
-        });
-        const data = await res.json();
+async function loadDocs(mechanicId) {
+    const docsEl = document.getElementById(`docs-${mechanicId}`);
+    docsEl.innerHTML = "<p style='font-size:12px; color:#999;'>Loading documents...</p>";
 
-        if (data.success) {
-            btn.closest(".card").style.opacity = "0.4";
-            btn.textContent = "Approved";
-        } else {
-            btn.textContent = "Failed";
-        }
+    const res = await fetch(`${API}/api/mechanic/${mechanicId}/docs`, {
+        headers: { "x-admin-token": adminToken }
+    });
+    const data = await res.json();
+
+    if (!data.success || data.data.length === 0) {
+        docsEl.innerHTML = "<p style='font-size:12px; color:#e53935;'>No documents uploaded.</p>";
+        return;
     }
 
+    docsEl.innerHTML = data.data.map(doc => `
+        <div style="margin-bottom:8px;">
+            <div style="font-size:11px; font-weight:700; color:#555; margin-bottom:4px;">
+                ${doc.doc_type === 'aadhar' ? ' Aadhaar Card' :  Shop Photo'}
+            </div>
+            <img src="${doc.image_data}" style="width:100%; max-width:300px; border-radius:10px; border:1px solid #eee;" />
+        </div>
+    `).join('');
+}
+
+async function approveMechanic(mechanicId, btn) {
+    btn.disabled = true;
+    btn.textContent = "Approving...";
+
+    const res = await fetch(`${API}/api/admin/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-token": adminToken },
+        body: JSON.stringify({ mechanic_id: mechanicId })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+        document.getElementById(`card-${mechanicId}`).style.opacity = "0.4";
+        btn.textContent = " Approved";
+    } else {
+        btn.textContent = " Failed";
+        btn.disabled = false;
+    }
+}
+
+function showRejectBox(mechanicId) {
+    document.getElementById(`reject-box-${mechanicId}`).style.display = "block";
+}
+
+function cancelReject(mechanicId) {
+    document.getElementById(`reject-box-${mechanicId}`).style.display = "none";
+}
+
+async function confirmReject(mechanicId) {
+    const reason = document.getElementById(`reject-reason-${mechanicId}`).value.trim();
+    if (!reason) {
+        alert("Please enter a reason for rejection.");
+        return;
+    }
+
+    const res = await fetch(`${API}/api/admin/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-token": adminToken },
+        body: JSON.stringify({ mechanic_id: mechanicId, reason: reason })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+        const card = document.getElementById(`card-${mechanicId}`);
+        card.style.opacity = "0.4";
+        card.querySelector('.badge-pending').textContent = "Rejected";
+        card.querySelector('.badge-pending').style.background = "#fce8e8";
+        card.querySelector('.badge-pending').style.color = "#c62828";
+    }
+}
     function handleLogout() {
         adminToken = "";
         document.getElementById("login-section").style.display = "block";
