@@ -65,6 +65,46 @@ async function handleAppointmentBooking() {
     }
 }
 
+async function handleUserRegistration() {
+    const fullName = document.querySelector('#screen-4 input[placeholder="Enter your full name"]')?.value.trim() || "";
+    const phone = document.querySelector('#screen-4 input[placeholder="Enter 10-digit mobile number"]')?.value.trim() || "";
+    const location = document.querySelector('#screen-4 input[placeholder="Enter your location"]')?.value.trim() || "";
+    const vehicleType = document.querySelector('#screen-4 input[placeholder="e.g., Motorcycle, Scooter"]')?.value.trim() || "";
+
+    if (!fullName || !phone || !location || !vehicleType) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    if (phone.length !== 10 || isNaN(phone)) {
+        alert("Please enter a valid 10-digit phone number.");
+        return;
+    }
+
+    try {
+        const res = await fetch('https://vahan-seva.onrender.com/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                role: 'user',
+                full_name: fullName,
+                phone: phone,
+                location: location,
+                vehicle_type: vehicleType
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(` Welcome ${fullName}! You are now registered. You can now book verified mechanics.`);
+            window.location.hash = '#screen-2';
+        } else {
+            alert("Registration failed: " + data.message);
+        }
+    } catch (e) {
+        alert("Cannot reach server. Please check your connection.");
+    }
+}
+
 // --- Navigation (SPA Logic) ---
 function handleNavigation() {
     const hash = window.location.hash || '#screen-1'; // Default to Home
