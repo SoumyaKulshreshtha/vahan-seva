@@ -28,6 +28,7 @@
             <a href="#screen-5">Register Mechanic</a>
             <a href="#screen-6">Docs</a>
             <a href="#screen-7">Home Visit</a>
+            <a href="#screen-8">My Bookings</a>
         </nav>
     </header>
 
@@ -430,6 +431,26 @@
         <button class="btn btn-blue full" onclick="handleAppointmentBooking()">
             📅 Confirm Home Appointment
         </button>
+    </div>
+</section>
+        <!-- =========================================================
+  SCREEN 8: My Bookings
+========================================================== -->
+<section id="screen-8" class="screen screen-register">
+    <div class="header-strip blue">
+        <a class="back" href="#screen-4">←</a>
+        <div>
+            <div class="header-title">My Bookings</div>
+            <div class="header-sub hi">मेरी बुकिंग</div>
+        </div>
+    </div>
+
+    <div style="padding:16px;">
+        <div id="user-welcome" style="background:#eef5ff; border-radius:16px; padding:14px; margin-bottom:16px; font-weight:700; color:#0b4dff; font-size:15px;">
+            👤 Loading...
+        </div>
+        <h3 style="font-size:16px; margin-bottom:12px;">Your Bookings</h3>
+        <div id="bookings-list"></div>
     </div>
 </section>
 
