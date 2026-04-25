@@ -127,6 +127,9 @@ function handleNavigation() {
         const results = getMechanicsForQuery(state.searchQuery);
         renderMechanics(results, state.searchQuery);
     }
+    if (hash === '#screen-8') {
+        loadUserBookings();
+    }
 }
 
 // --- Search Helper ---
