@@ -320,6 +320,10 @@ async function handleMechanicRegistration() {
 async function loadUserBookings() {
     const listEl = document.getElementById('bookings-list');
     if (!listEl) return;
+    const welcomeEl = document.getElementById('user-welcome');
+    if (welcomeEl && state.currentUser) {
+        welcomeEl.textContent = `👤 Welcome, ${state.currentUser.full_name} — ${state.currentUser.phone}`;
+    }
 
     if (!state.currentUser) {
         listEl.innerHTML = `<p style="text-align:center; color:#666;">Please register or login first.</p>`;
