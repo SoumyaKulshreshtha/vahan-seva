@@ -9,6 +9,7 @@ window.state = {
     userLocation: null,
     mechanics: [], // Start empty, no mocks as requested
     searchQuery: "" // Store search across screens
+    currentUser: null
 };
 
 // --- Utilities ---
