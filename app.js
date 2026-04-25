@@ -96,8 +96,10 @@ async function handleUserRegistration() {
         });
         const data = await res.json();
         if (data.success) {
-            alert(` Welcome ${fullName}! You are now registered. You can now book verified mechanics.`);
-            window.location.hash = '#screen-2';
+            if (data.success) {
+                state.currentUser = data.data; // ← add this line
+                alert(`✅ Welcome ${fullName}! You are now registered.`);
+                window.location.hash = '#screen-8';  // go to bookings screen
         } else {
             alert("Registration failed: " + data.message);
         }
