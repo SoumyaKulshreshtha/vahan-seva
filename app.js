@@ -313,6 +313,51 @@ async function handleMechanicRegistration() {
     }
 }
 
+//--- Load User Bookings ---
+async function loadUserBookings() {
+    const listEl = document.getElementById('bookings-list');
+    if (!listEl) return;
+
+    if (!state.currentUser) {
+        listEl.innerHTML = `<p style="text-align:center; color:#666;">Please register or login first.</p>`;
+        return;
+    }
+
+    listEl.innerHTML = `<p style="color:#999;">Loading...</p>`;
+
+    try {
+        const res = await fetch(`https://vahan-seva.onrender.com/api/bookings/user/${state.currentUser.id}`);
+        const data = await res.json();
+
+        if (!data.success || data.data.length === 0) {
+            listEl.innerHTML = `<p style="text-align:center; color:#666;">No bookings yet.</p>`;
+            return;
+        }
+
+        listEl.innerHTML = data.data.map(b => `
+            <div style="background:#fff; border:1px solid #eef1f7; border-radius:16px; padding:14px; margin-bottom:12px;">
+                <div style="font-weight:900; font-size:15px; margin-bottom:6px;">
+                    ${b.shop_name} 
+                    <span style="background:${b.status === 'Completed' ? '#eafff2' : b.status === 'Rejected' ? '#fce8e8' : '#fff3e0'}; 
+                           color:${b.status === 'Completed' ? '#0b7f40' : b.status === 'Rejected' ? '#c62828' : '#e65100'}; 
+                           border-radius:999px; padding:4px 10px; font-size:12px;">
+                        ${b.status}
+                    </span>
+                </div>
+                <div style="font-size:13px; color:#6b7a90; line-height:1.6;">
+                    🔧 ${b.service_type}<br>
+                    📝 ${b.problem || "No details provided"}<br>
+                    🕐 ${b.preferred_datetime || "Any time"}<br>
+                    📞 Mechanic: ${b.mechanic_name} — ${b.mechanic_phone}<br>
+                    📅 ${new Date(b.created_at).toLocaleString()}
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        listEl.innerHTML = `<p style="text-align:center; color:#e53935;">Could not load bookings.</p>`;
+    }
+}
+
 
 // --- Search Logic ---
 function handleSearch(e) {
@@ -433,3 +478,4 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.addEventListener('input', handleSearch);
     }
 });
+
