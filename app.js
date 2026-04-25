@@ -7,8 +7,8 @@
 
 window.state = {
     userLocation: null,
-    mechanics: [], // Start empty, no mocks as requested
-    searchQuery: "" // Store search across screens
+    mechanics: [],
+    searchQuery: "",
     currentUser: null
 };
 
@@ -18,16 +18,17 @@ function toRad(value) {
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Earth radius in km
+    const R = 6371;
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
+    return R * c;
 }
 
+// --- Appointment Booking ---
 async function handleAppointmentBooking() {
     const fullName = document.getElementById('appt-name')?.value.trim() || "";
     const phone = document.getElementById('appt-phone')?.value.trim() || "";
@@ -66,6 +67,7 @@ async function handleAppointmentBooking() {
     }
 }
 
+// --- User Registration ---
 async function handleUserRegistration() {
     const fullName = document.querySelector('#screen-4 input[placeholder="Enter your full name"]')?.value.trim() || "";
     const phone = document.querySelector('#screen-4 input[placeholder="Enter 10-digit mobile number"]')?.value.trim() || "";
@@ -96,10 +98,9 @@ async function handleUserRegistration() {
         });
         const data = await res.json();
         if (data.success) {
-            if (data.success) {
-                state.currentUser = data.data; // ← add this line
-                alert(`✅ Welcome ${fullName}! You are now registered.`);
-                window.location.hash = '#screen-8';  // go to bookings screen
+            state.currentUser = data.data;
+            alert(`✅ Welcome ${fullName}! You are now registered.`);
+            window.location.hash = '#screen-8';
         } else {
             alert("Registration failed: " + data.message);
         }
@@ -110,19 +111,16 @@ async function handleUserRegistration() {
 
 // --- Navigation (SPA Logic) ---
 function handleNavigation() {
-    const hash = window.location.hash || '#screen-1'; // Default to Home
+    const hash = window.location.hash || '#screen-1';
 
-    // Hide all screens
     document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
 
-    // Show target screen
     const target = document.querySelector(hash);
     if (target) {
         target.classList.add('active');
         window.scrollTo(0, 0);
     }
 
-    // If navigating to Verified List (Screen 3), render with saved query
     if (hash === '#screen-3') {
         const results = getMechanicsForQuery(state.searchQuery);
         renderMechanics(results, state.searchQuery);
@@ -138,14 +136,12 @@ function getMechanicsForQuery(query) {
 
     const q = query.toLowerCase().trim();
 
-    // 1. Local Search (Registered Mechanics)
     const localResults = state.mechanics.filter(m =>
         (m.shop_name && m.shop_name.toLowerCase().includes(q)) ||
         (m.address && m.address.toLowerCase().includes(q)) ||
         (m.name && m.name.toLowerCase().includes(q))
     );
 
-    // 2. Google Fallback/Supplement: Generate results for ANY city
     const city = q.charAt(0).toUpperCase() + q.slice(1);
 
     const googleResults = [
@@ -172,14 +168,11 @@ function getMechanicsForQuery(query) {
         }
     ];
 
-    // 3. MERGE: Show Local matches FIRST, then Google suggestions
     return [...localResults, ...googleResults];
 }
 
-
 // --- Data & API ---
 async function initData() {
-    // 1. Try to fetch from API (Real Backend)
     try {
         const res = await fetch('https://vahan-seva.onrender.com/api/mechanics');
         if (res.ok) {
@@ -190,7 +183,9 @@ async function initData() {
                     ...m,
                     name: m.shop_name,
                     address: m.shop_address,
-                    distance: m.distance_km || 2.0
+                    distance: m.distance_km || 2.0,
+                    price_service: m.price_service || "0",
+                    price_wash: m.price_wash || "0"
                 }));
             }
         }
@@ -198,7 +193,6 @@ async function initData() {
         console.warn("Backend not running. List will look for local state only.");
     }
 
-    // 2. Geolocation
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -207,9 +201,7 @@ async function initData() {
                     lon: position.coords.longitude
                 };
 
-                // Logic for Dynamic Distance for new entries
                 state.mechanics.forEach((m) => {
-                    // Simulate coordinates if missing
                     if (!m.lat || m.lat === 0) {
                         const latOffset = (Math.random() - 0.5) * 0.04;
                         const lonOffset = (Math.random() - 0.5) * 0.04;
@@ -219,10 +211,8 @@ async function initData() {
                     m.distance = calculateDistance(state.userLocation.lat, state.userLocation.lon, m.lat, m.lon);
                 });
 
-                // Sort by distance
                 state.mechanics.sort((a, b) => a.distance - b.distance);
 
-                // If on list screen, re-render
                 if (window.location.hash === '#screen-3') {
                     const results = getMechanicsForQuery(state.searchQuery);
                     renderMechanics(results, state.searchQuery);
@@ -235,7 +225,7 @@ async function initData() {
     }
 }
 
-// --- Registration Logic ---
+// --- Mechanic Registration ---
 async function handleMechanicRegistration() {
     const fullName = document.querySelector('#screen-5 input[placeholder="Enter your full name"]')?.value.trim() || "";
     const phone = document.querySelector('#screen-5 input[placeholder="Enter 10-digit mobile number"]')?.value.trim() || "";
@@ -316,10 +306,11 @@ async function handleMechanicRegistration() {
     }
 }
 
-//--- Load User Bookings ---
+// --- Load User Bookings ---
 async function loadUserBookings() {
     const listEl = document.getElementById('bookings-list');
     if (!listEl) return;
+
     const welcomeEl = document.getElementById('user-welcome');
     if (welcomeEl && state.currentUser) {
         welcomeEl.textContent = `👤 Welcome, ${state.currentUser.full_name} — ${state.currentUser.phone}`;
@@ -344,9 +335,9 @@ async function loadUserBookings() {
         listEl.innerHTML = data.data.map(b => `
             <div style="background:#fff; border:1px solid #eef1f7; border-radius:16px; padding:14px; margin-bottom:12px;">
                 <div style="font-weight:900; font-size:15px; margin-bottom:6px;">
-                    ${b.shop_name} 
-                    <span style="background:${b.status === 'Completed' ? '#eafff2' : b.status === 'Rejected' ? '#fce8e8' : '#fff3e0'}; 
-                           color:${b.status === 'Completed' ? '#0b7f40' : b.status === 'Rejected' ? '#c62828' : '#e65100'}; 
+                    ${b.shop_name}
+                    <span style="background:${b.status === 'Completed' ? '#eafff2' : b.status === 'Rejected' ? '#fce8e8' : '#fff3e0'};
+                           color:${b.status === 'Completed' ? '#0b7f40' : b.status === 'Rejected' ? '#c62828' : '#e65100'};
                            border-radius:999px; padding:4px 10px; font-size:12px;">
                         ${b.status}
                     </span>
@@ -365,13 +356,11 @@ async function loadUserBookings() {
     }
 }
 
-
 // --- Search Logic ---
 function handleSearch(e) {
     const query = e.target.value.toLowerCase().trim();
-    state.searchQuery = query; // Save to state
+    state.searchQuery = query;
 
-    // If already on list screen, update live
     if (window.location.hash === '#screen-3') {
         const results = getMechanicsForQuery(query);
         renderMechanics(results, query);
@@ -386,10 +375,8 @@ function renderMechanics(mechanics, searchQuery = "") {
     if (!listContainer) return;
     listContainer.innerHTML = '';
 
-    // If no mechanics pass in (null/undefined), use defaults
     const list = mechanics || state.mechanics;
 
-    // Update count badge
     if (countBadge) {
         if (searchQuery && list.length > 0) {
             countBadge.innerText = `🔍 Found ${list.length} results`;
@@ -407,35 +394,29 @@ function renderMechanics(mechanics, searchQuery = "") {
         return;
     }
 
-    // Separate Verified vs External
     const verifiedList = list.filter(m => m.verified === 1 || m.verified === true);
     const externalList = list.filter(m => m.verified === 0 || m.verified === false || m.verified === -1);
 
-    // 1. Render Verified Mechanics
     if (verifiedList.length > 0) {
         const vHeader = document.createElement('h3');
         vHeader.style.cssText = "font-size:14px; color:#0b7f40; margin:16px 0 8px 0; border-bottom:1px solid #e0e0e0; padding-bottom:4px;";
         vHeader.innerHTML = "✅ Verified Mechanics (App Registered)";
         listContainer.appendChild(vHeader);
-
         verifiedList.forEach(m => renderCard(m, listContainer));
     }
 
-    // 2. Render External/Non-Registered Mechanics
     if (externalList.length > 0) {
         const eHeader = document.createElement('h3');
         eHeader.style.cssText = "font-size:14px; color:#666; margin:24px 0 8px 0; border-bottom:1px solid #e0e0e0; padding-bottom:4px;";
         eHeader.innerHTML = "🌐 Non-Registered Mechanics (from Google)";
         listContainer.appendChild(eHeader);
-
         externalList.forEach(m => renderCard(m, listContainer));
     }
 
-    // If searching, show "View More on Google" at bottom to ensure fallback exists visibly
     if (searchQuery) {
         const googleBtn = document.createElement('div');
         googleBtn.innerHTML = `
-            <a href="https://www.google.com/maps/search/mechanics+near+${searchQuery}" target="_blank" 
+            <a href="https://www.google.com/maps/search/mechanics+near+${searchQuery}" target="_blank"
                class="btn full" style="background:#fff; color:#0b4dff; border:1px solid #e7ebf4; margin-top:12px; text-align:center;">
                See more results on Google Maps ↗
             </a>
@@ -470,19 +451,12 @@ function renderCard(m, container) {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Nav Listener
     window.addEventListener('hashchange', handleNavigation);
-
-    // Initial Route
     handleNavigation();
-
-    // Load Data
     initData();
 
-    // Attach Search Listener to the input on Screen 2
     const searchInput = document.querySelector('.searchbar input');
     if (searchInput) {
         searchInput.addEventListener('input', handleSearch);
     }
 });
-
